@@ -1,45 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { AppContext } from "../context/AppContext";
 
-export default function TimerItem({ timer, updateTimer }) {
-  const [timeLeft, setTimeLeft] = useState(timer.time);
+function TimerItem({ groupId, taskId, timer }) {
+  const { updateTimer } = useContext(AppContext);
   const [isRunning, setIsRunning] = useState(false);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    let interval = null;
-    if (isRunning && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
+    if (isRunning) {
+      intervalRef.current = setInterval(() => {
+        updateTimer(groupId, taskId, timer.id, timer.timeLeft - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
-      clearInterval(interval);
-      alert(`Таймер "${timer.name}" завершён!`);
-      setIsRunning(false);
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
-    return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
 
-  useEffect(() => {
-    updateTimer(timer.id, timeLeft);
-  }, [timeLeft]);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isRunning, groupId, taskId, timer, updateTimer]);
+
+  const handleStartPause = () => {
+    setIsRunning(!isRunning);
+  };
+
+  const handleReset = () => {
+    updateTimer(groupId, taskId, timer.id, timer.duration);
+    setIsRunning(false);
+  };
 
   const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const min = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const sec = String(seconds % 60).padStart(2, "0");
+    return `${min}:${sec}`;
   };
 
   return (
-    <div className="p-4 border rounded shadow flex justify-between items-center">
-      <div>
-        <div className="font-bold">{timer.name}</div>
-        <div className="text-lg">{formatTime(timeLeft)}</div>
+    <div className="p-4 border rounded-lg flex justify-between items-center bg-white shadow">
+      <div className="text-lg font-semibold">{timer.name}</div>
+      <div className="text-xl font-mono">{formatTime(timer.timeLeft)}</div>
+      <div className="space-x-2">
+        <button onClick={handleStartPause} className="px-3 py-1 bg-green-500 text-white rounded">
+          {isRunning ? "Pause" : "Start"}
+        </button>
+        <button onClick={handleReset} className="px-3 py-1 bg-red-500 text-white rounded">
+          Reset
+        </button>
       </div>
-      <button
-        className={`px-4 py-2 rounded text-white ${isRunning ? 'bg-red-500' : 'bg-green-500'}`}
-        onClick={() => setIsRunning(!isRunning)}
-      >
-        {isRunning ? 'Стоп' : 'Старт'}
-      </button>
     </div>
   );
 }
+
+export default TimerItem;
