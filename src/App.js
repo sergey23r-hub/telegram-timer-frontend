@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Timers from './components/Timers';
-import Tasks from './components/Tasks';
-import Settings from './components/Settings';
+import Timers from './components/Timers.js';
+import Tasks from './components/Tasks.js';
+import Settings from './components/Settings.js';
 
 export const LanguageContext = React.createContext();
 
