@@ -1,50 +1,38 @@
-import React, { useState, useContext } from 'react';
-import { LanguageContext } from '../App';
+import React, { useState, useEffect } from 'react';
+import TimerItem from './TimerItem';
 
 export default function Timers() {
-  const { language } = useContext(LanguageContext);
-  const [timers, setTimers] = useState([]);
-  const [time, setTime] = useState('');
+  const [timers, setTimers] = useState(() => {
+    const saved = localStorage.getItem('timers');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const texts = {
-    ru: { add: 'Добавить таймер', placeholder: 'Введите время (в минутах)', remove: 'Удалить' },
-    en: { add: 'Add Timer', placeholder: 'Enter time (minutes)', remove: 'Remove' }
-  };
+  useEffect(() => {
+    localStorage.setItem('timers', JSON.stringify(timers));
+  }, [timers]);
 
   const addTimer = () => {
-    if (time) {
-      setTimers([...timers, parseInt(time)]);
-      setTime('');
+    const label = prompt('Введите название таймера');
+    const minutes = parseInt(prompt('Введите время (минуты)'), 10);
+    if (label && minutes > 0) {
+      setTimers([...timers, { id: Date.now(), label, seconds: minutes * 60, isRunning: false }]);
     }
   };
 
-  const removeTimer = (index) => {
-    setTimers(timers.filter((_, i) => i !== index));
+  const updateTimer = (id, newTimer) => {
+    setTimers(timers.map(timer => timer.id === id ? newTimer : timer));
+  };
+
+  const deleteTimer = (id) => {
+    setTimers(timers.filter(timer => timer.id !== id));
   };
 
   return (
     <div>
-      <input
-        type="number"
-        value={time}
-        onChange={(e) => setTime(e.target.value)}
-        placeholder={texts[language].placeholder}
-        className="border p-1 mr-2"
-      />
-      <button onClick={addTimer} className="bg-blue-500 text-white px-2 py-1 rounded">
-        {texts[language].add}
-      </button>
-
-      <ul className="mt-4">
-        {timers.map((t, index) => (
-          <li key={index} className="flex justify-between items-center mb-2">
-            {t} min
-            <button onClick={() => removeTimer(index)} className="text-red-500">
-              {texts[language].remove}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <button onClick={addTimer} className="mb-4 bg-blue-500 text-white px-3 py-1 rounded">Добавить таймер</button>
+      {timers.map(timer => (
+        <TimerItem key={timer.id} timer={timer} updateTimer={updateTimer} deleteTimer={deleteTimer} />
+      ))}
     </div>
   );
 }
