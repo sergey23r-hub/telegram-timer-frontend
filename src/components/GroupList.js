@@ -1,39 +1,46 @@
-import React, { useState } from "react";
-import { useAppContext } from "../context/AppContext";
+import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
+import TaskList from './TaskList';
 
 const GroupList = () => {
-  const { groups, addGroup } = useAppContext();
-  const [groupName, setGroupName] = useState("");
+  const { groups, addGroup, removeGroup } = useAppContext();
+  const [groupName, setGroupName] = useState('');
 
   const handleAddGroup = () => {
-    if (groupName.trim() !== "") {
-      addGroup(groupName.trim());
-      setGroupName("");
+    if (groupName.trim()) {
+      addGroup(groupName);
+      setGroupName('');
     }
   };
 
   return (
-    <div className="p-4 border rounded shadow">
-      <h2 className="text-lg font-bold mb-2">Groups</h2>
-      <div className="flex mb-4">
+    <div className="space-y-6">
+      <div className="flex space-x-2">
         <input
           type="text"
-          className="border p-2 flex-grow mr-2"
-          placeholder="New group name"
           value={groupName}
           onChange={(e) => setGroupName(e.target.value)}
+          placeholder="Название группы"
+          className="p-2 border rounded w-full"
         />
         <button onClick={handleAddGroup} className="bg-blue-500 text-white px-4 py-2 rounded">
-          Add Group
+          Добавить
         </button>
       </div>
-      <ul>
+
+      <div className="space-y-4">
         {groups.map((group) => (
-          <li key={group.id} className="mb-2">
-            {group.name}
-          </li>
+          <div key={group.id} className="p-4 border rounded bg-white shadow">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-semibold">{group.name}</h2>
+              <button onClick={() => removeGroup(group.id)} className="text-red-500">
+                Удалить
+              </button>
+            </div>
+            <TaskList groupId={group.id} />
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

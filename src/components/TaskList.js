@@ -1,41 +1,46 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import TimerList from './TimerList';
 
 const TaskList = ({ groupId }) => {
-  const { groups, addTask } = useAppContext();
-  const group = groups.find(g => g.id === groupId);
+  const { tasks, addTask, removeTask } = useAppContext();
   const [taskName, setTaskName] = useState('');
 
-  if (!group) {
-    return <div>Group not found</div>;
-  }
-
   const handleAddTask = () => {
-    if (taskName.trim() === '') return;
-    addTask(groupId, taskName);
-    setTaskName('');
+    if (taskName.trim()) {
+      addTask(groupId, taskName);
+      setTaskName('');
+    }
   };
 
+  const filteredTasks = tasks.filter(task => task.groupId === groupId);
+
   return (
-    <div className="p-4 border rounded bg-white mt-4">
-      <h3 className="text-lg font-semibold mb-2">Tasks in {group.name}</h3>
-      <div className="flex mb-4">
+    <div className="space-y-4">
+      <div className="flex space-x-2 mb-2">
         <input
           type="text"
-          className="flex-grow border p-2 mr-2"
-          placeholder="New task name"
           value={taskName}
-          onChange={e => setTaskName(e.target.value)}
+          onChange={(e) => setTaskName(e.target.value)}
+          placeholder="Название задачи"
+          className="p-2 border rounded w-full"
         />
         <button onClick={handleAddTask} className="bg-green-500 text-white px-4 py-2 rounded">
-          Add Task
+          Добавить
         </button>
       </div>
-      <ul>
-        {group.tasks.map(task => (
-          <li key={task.id} className="p-2 border-b">{task.name}</li>
-        ))}
-      </ul>
+
+      {filteredTasks.map((task) => (
+        <div key={task.id} className="p-4 border rounded bg-gray-100">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-medium">{task.name}</h3>
+            <button onClick={() => removeTask(task.id)} className="text-red-500">
+              Удалить
+            </button>
+          </div>
+          <TimerList taskId={task.id} />
+        </div>
+      ))}
     </div>
   );
 };
