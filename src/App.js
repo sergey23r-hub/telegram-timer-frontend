@@ -6,7 +6,7 @@ function App() {
   return (
     <AppProvider>
       <div className="min-h-screen bg-gray-100 p-4">
-        <h1 className="text-2xl font-bold mb-4">Telegram Timer</h1>
+        <h1 className="text-2xl font-bold mb-4">Список групп и задач</h1>
         <GroupList />
       </div>
     </AppProvider>
