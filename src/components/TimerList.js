@@ -2,41 +2,42 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 
 const TimerList = ({ taskId }) => {
-  const { timers, addTimer, removeTimer } = useAppContext();
-  const [timerName, setTimerName] = useState('');
+  const { timers, addTimer } = useAppContext();
+  const [newTimerName, setNewTimerName] = useState('');
 
   const handleAddTimer = () => {
-    if (timerName.trim()) {
-      addTimer(taskId, timerName);
-      setTimerName('');
+    if (newTimerName.trim() !== '') {
+      addTimer(taskId, newTimerName.trim());
+      setNewTimerName('');
     }
   };
 
-  const filteredTimers = timers.filter(timer => timer.taskId === taskId);
+  const filteredTimers = timers.filter((timer) => timer.taskId === taskId);
 
   return (
-    <div className="space-y-2">
-      <div className="flex space-x-2 mb-2">
+    <div className="ml-4">
+      <h3 className="font-semibold mb-2">Таймеры</h3>
+
+      <div className="flex mb-2">
         <input
           type="text"
-          value={timerName}
-          onChange={(e) => setTimerName(e.target.value)}
+          value={newTimerName}
+          onChange={(e) => setNewTimerName(e.target.value)}
           placeholder="Название таймера"
           className="p-2 border rounded w-full"
         />
-        <button onClick={handleAddTimer} className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button onClick={handleAddTimer} className="bg-blue-500 text-white px-4 py-2 rounded ml-2">
           Добавить
         </button>
       </div>
 
-      {filteredTimers.map((timer) => (
-        <div key={timer.id} className="flex justify-between items-center p-2 border rounded bg-white">
-          <span>{timer.name}</span>
-          <button onClick={() => removeTimer(timer.id)} className="text-red-500">
-            Удалить
-          </button>
-        </div>
-      ))}
+      <div className="space-y-1">
+        {filteredTimers.map((timer) => (
+          <div key={timer.id} className="p-2 border rounded bg-gray-100">
+            {timer.name}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
