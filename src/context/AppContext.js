@@ -1,25 +1,47 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [groups, setGroups] = useState([
-    { id: 1, name: 'Рабочие задачи' },
-    { id: 2, name: 'Личное развитие' }
-  ]);
+  const [groups, setGroups] = useState([]);
 
-  const [tasks, setTasks] = useState([
-    { id: 1, groupId: 1, name: 'Написать отчет' },
-    { id: 2, groupId: 2, name: 'Прочитать книгу' }
-  ]);
+  const addGroup = (name) => {
+    const newGroup = { id: Date.now(), name, tasks: [] };
+    setGroups((prev) => [...prev, newGroup]);
+  };
 
-  const [timers, setTimers] = useState([
-    { id: 1, taskId: 1, name: 'Помидорка 1', duration: 25 * 60 },
-    { id: 2, taskId: 2, name: 'Помидорка 2', duration: 45 * 60 }
-  ]);
+  const addTask = (groupId, taskName) => {
+    setGroups((prev) =>
+      prev.map((group) =>
+        group.id === groupId
+          ? {
+              ...group,
+              tasks: [...group.tasks, { id: Date.now(), name: taskName, timers: [] }],
+            }
+          : group
+      )
+    );
+  };
+
+  const addTimer = (groupId, taskId, timerName) => {
+    setGroups((prev) =>
+      prev.map((group) =>
+        group.id === groupId
+          ? {
+              ...group,
+              tasks: group.tasks.map((task) =>
+                task.id === taskId
+                  ? { ...task, timers: [...task.timers, { id: Date.now(), name: timerName }] }
+                  : task
+              ),
+            }
+          : group
+      )
+    );
+  };
 
   return (
-    <AppContext.Provider value={{ groups, tasks, timers }}>
+    <AppContext.Provider value={{ groups, addGroup, addTask, addTimer }}>
       {children}
     </AppContext.Provider>
   );

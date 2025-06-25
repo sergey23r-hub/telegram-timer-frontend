@@ -1,12 +1,13 @@
-import React from 'react';
-import { AppProvider } from './context/AppContext';
+import React from "react";
+import { AppProvider } from "./context/AppContext";
+import GroupList from "./components/GroupList";
 
 function App() {
   return (
     <AppProvider>
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Приложение таймеров</h1>
-        <p>Тут будет выводиться список групп, задач и таймеров.</p>
+      <div className="min-h-screen bg-gray-100 p-4">
+        <h1 className="text-2xl font-bold mb-4">Telegram Timer</h1>
+        <GroupList />
       </div>
     </AppProvider>
   );
